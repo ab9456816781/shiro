@@ -1,0 +1,224 @@
+shiro介绍
+
+四大基石
+认证  授权 会话管理  加密 。。。web支持，缓存， 并发，测试 ,runas,remeber me
+
+shiro 组建
+subject主题 当前用户， -- shiro SecurityManager （subject委托给这个，实际操作者，）-- 注入reaim 从这里获取数据 安全数据源
+
+架构图
+authenticator 处理用户的登入逻辑，调用接口。
+authorizer 决定用户能够做什么 不能做什么 策略
+session manager 会话管理器，
+cache manager 缓存 ，
+reaim 桥梁，一个数据源调用一个reaim 接口
+
+身份认证  需要补充
+认证器，  可以自定义，
+subject login方法 -- 实例对象 --security manager 实例--接到 token令牌信息，--authenticator -- Authentication Strategy  -- 各种reaim
+reaim:域，Shiro从从Realm获取安全数据（如用户、角色、权限），就是说SecurityManager要验证用户身份，那么它需要从Realm获取相应的用户进行比较以确定用户身份是否合法；也需要从Realm得到用户相应的角色/权限进行验证用户是否能进行操作；可以把Realm看成DataSource，即安全数据源。
+
+
+授权  访问控制  支持通配符user:*
+主题subject(用户)   资源（授权后，可以访问jsp..）  权限(核心 crud操作，都建立在资源下)  角色role(传统角色，权限角色)
+
+subject .ispermitted"hasRole" -- 委托给security Manager  -- 授权者 authorizer-- reaims 匹配相应的subject权限()
+
+WildcardPermission  
+authorizationinfo
+
+
+权限拦截
+基于拦截器列， 
+filter -- abstractFilter -- nameableFilter --oncePerRequestFilter--abstarctShiroFilter -- shiroFilter
+														--adviceFilter(preHanle 前序增强postHandle 后续增强)--pathmatchingFilter--accessControlFilter
+
+通过 shiro 自己的拦截器链  在 servlet 的 拦截器  proxiedFilterChain 
+
+会话管理 、
+
+权限缓存 cacheManager
+oscache redis .... shiro 自己没有实现缓存。
+
+
+spring boot + shiro + mybatis + jsp
+
+case
+
+pom.xml
+-------------------------------------------------------
+<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!--添加shiro-->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-core</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<!--在spring下  连接-->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-spring</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<!--数据库管理-->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.0.18</version>
+		</dependency>
+		<!--工具包-->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+		<!--spring 工具包 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>4.1.9.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+
+		<!--jsp  jstl-->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+	</dependencies>
+	
+case
+----------------------------------
+自定义realm
+继承 authorizingrealm 
+1.授权  从session中获取用户
+2.认证登录
+
+
+自定义密码校验规则
+对密码进行操作 ，正常的只是进行token info 操作了
+credentialmatcher extends simplecredentialmatcher
+重写docredentialsmatch
+
+注入 shiro 配置中
+shiroconfiguration  分层 qualifier spring上下文的realm
+
+authc  defaultfiter
+
+
+
+1. 只能登入才能访问的接口
+2. 有些接口只能指定用户访问
+3. 不同的接口使用不同的权限来访问控制
+
+
+authorizingrealm 可以指定是否使用cache cachemagae
+
+数据库监控 
+
+
+优点
+易于使用
+web能力强灵活
+
+缺点
+学习资料少
+自己实现rbac 操作界面自己实现
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
